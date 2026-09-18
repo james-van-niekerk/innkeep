@@ -1,46 +1,61 @@
 import type { CliRenderer } from "@opentui/core";
-import {
-	BoxRenderable,
-	SelectRenderable,
-	SelectRenderableEvents,
-} from "@opentui/core";
+import { SelectRenderable, SelectRenderableEvents } from "@opentui/core";
 import type { BrewPackage } from "../../types/brew";
+import { theme } from "../theme";
 
 export class PackageList {
-	readonly panel: BoxRenderable;
-	private readonly select: SelectRenderable;
+	readonly renderable: SelectRenderable;
 
-	constructor(renderer: CliRenderer, onSelect: (pkg: BrewPackage) => void) {
-		this.panel = new BoxRenderable(renderer, {
-			borderStyle: "single",
-			borderColor: "#666666",
-			width: 60,
-			height: 20,
-		});
-
-		this.select = new SelectRenderable(renderer, {
-			id: "packages",
+	constructor(
+		renderer: CliRenderer,
+		id: string,
+		handlers: {
+			onHighlight?: (pkg: BrewPackage) => void;
+			onSelect?: (pkg: BrewPackage) => void;
+		} = {},
+	) {
+		this.renderable = new SelectRenderable(renderer, {
+			id,
 			width: "100%",
 			height: "100%",
 			options: [],
-			showDescription: false,
+			showDescription: true,
+			backgroundColor: theme.panelBg,
+			textColor: theme.text,
+			selectedTextColor: theme.accent,
+			descriptionColor: theme.textDim,
 		});
 
-		this.panel.add(this.select);
-
-		this.select.on(SelectRenderableEvents.ITEM_SELECTED, (_index, option) => {
-			onSelect({ name: option.name, version: option.description });
+		this.renderable.on(
+			SelectRenderableEvents.SELECTION_CHANGED,
+			(_i, option) => {
+				if (option) handlers.onHighlight?.(toPackage(option));
+			},
+		);
+		this.renderable.on(SelectRenderableEvents.ITEM_SELECTED, (_i, option) => {
+			if (option) handlers.onSelect?.(toPackage(option));
 		});
 	}
 
 	focus(): void {
-		this.select.focus();
+		this.renderable.focus();
+	}
+
+	blur(): void {
+		this.renderable.blur();
 	}
 
 	setPackages(packages: BrewPackage[]): void {
-		this.select.options = packages.map((pkg) => ({
+		this.renderable.options = packages.map((pkg) => ({
 			name: pkg.name,
 			description: pkg.version ?? "",
 		}));
 	}
+}
+
+function toPackage(option: {
+	name: string;
+	description?: string;
+}): BrewPackage {
+	return { name: option.name, version: option.description || undefined };
 }

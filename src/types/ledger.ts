@@ -1,6 +1,6 @@
 import type { BrewPackage } from "./brew";
 
-export interface Profile {
+export interface Ledger {
 	formulae: BrewPackage[];
 	casks: BrewPackage[];
 	savedAt: string;

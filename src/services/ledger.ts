@@ -1,7 +1,7 @@
-import type { Profile } from "../types/profile";
+import type { Ledger } from "../types/ledger";
 import { listInstalledCasks, listInstalledFormulae } from "./brew";
 
-export async function captureProfile(): Promise<Profile> {
+export async function captureLedger(): Promise<Ledger> {
 	const [formulae, casks] = await Promise.all([
 		listInstalledFormulae(),
 		listInstalledCasks(),
@@ -9,13 +9,13 @@ export async function captureProfile(): Promise<Profile> {
 	return { formulae, casks, savedAt: new Date().toISOString() };
 }
 
-export async function saveProfile(
+export async function saveLedger(
 	path: string,
-	profile: Profile,
+	ledger: Ledger,
 ): Promise<void> {
-	await Bun.write(path, JSON.stringify(profile, null, 2));
+	await Bun.write(path, JSON.stringify(ledger, null, 2));
 }
 
-export async function loadProfile(path: string): Promise<Profile> {
+export async function loadLedger(path: string): Promise<Ledger> {
 	return Bun.file(path).json();
 }
