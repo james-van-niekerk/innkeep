@@ -1,7 +1,7 @@
-import { useKeyboard } from "@opentui/solid";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup } from "solid-js";
 import { listInstalledCasks, listInstalledFormulae } from "../../services/brew";
 import type { BrewPackage } from "../../types/brew";
+import type { KeyboardService } from "../keyboard/keyboard";
 import { borderStyle, theme } from "../theme";
 
 type Source = "formulae" | "casks";
@@ -12,7 +12,10 @@ const SOURCES = [
 	{ name: "Casks", description: "" },
 ];
 
-export function InstalledTab(props: { setStatus: (text: string) => void }) {
+export function InstalledTab(props: {
+	setStatus: (text: string) => void;
+	keyboard: KeyboardService;
+}) {
 	const [source, setSource] = createSignal<Source>("formulae");
 	const [packages, setPackages] = createSignal<BrewPackage[]>([]);
 	const [selectedIndex, setSelectedIndex] = createSignal(0);
@@ -38,11 +41,25 @@ export function InstalledTab(props: { setStatus: (text: string) => void }) {
 
 	loadPackages();
 
-	useKeyboard((key) => {
-		if (key.name === "r") loadPackages();
-		if (key.name === "tab")
-			setFocusedPane(focusedPane() === "main" ? "sidebar" : "main");
+	createEffect(() => {
+		props.keyboard.setActiveScope({
+			id: "installed",
+			bindings: () => [
+				{ key: "r", label: "reload", action: () => loadPackages() },
+				{
+					key: "left",
+					label: "pane",
+					action: () => setFocusedPane("sidebar"),
+				},
+				{
+					key: "right",
+					label: "pane",
+					action: () => setFocusedPane("main"),
+				},
+			],
+		});
 	});
+	onCleanup(() => props.keyboard.setActiveScope(null));
 
 	const selectedPackage = () => packages()[selectedIndex()];
 

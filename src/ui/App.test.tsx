@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { testRender } from "@opentui/solid";
 import { App } from "./App";
+import { createKeyboardService } from "./keyboard/keyboard";
 import { SearchTab } from "./tabs/SearchTab";
 
 test("the app shows all three tabs", async () => {
@@ -17,7 +18,11 @@ test("the app shows all three tabs", async () => {
 });
 
 test("the search tab draws an empty panel", async () => {
-	const app = await testRender(() => <SearchTab />, { width: 40, height: 6 });
+	const keyboard = createKeyboardService();
+	const app = await testRender(() => <SearchTab keyboard={keyboard} />, {
+		width: 40,
+		height: 6,
+	});
 	await app.renderOnce();
 
 	expect(app.captureCharFrame()).toContain("─ Search ─");

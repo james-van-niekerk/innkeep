@@ -1,6 +1,7 @@
 import type { TabSelectRenderable } from "@opentui/core";
 import { useKeyboard, useRenderer } from "@opentui/solid";
 import { createSignal, Match, Switch } from "solid-js";
+import { createKeyboardService } from "./keyboard/keyboard";
 import { InstalledTab } from "./tabs/InstalledTab";
 import { LedgersTab } from "./tabs/LedgersTab";
 import { SearchTab } from "./tabs/SearchTab";
@@ -12,17 +13,12 @@ const TABS = [
 	{ name: "Ledgers", description: "Configure ledgers" },
 ];
 
-const TAB_HINTS = [
-	"tab pane · ↑↓ move · r reload · 1-3 tabs · q quit",
-	"1-3 tabs · q quit",
-	"1-3 tabs · q quit",
-];
-
 export function App() {
 	const renderer = useRenderer();
+	const keyboard = createKeyboardService();
 
 	const [activeTab, setActiveTab] = createSignal(0);
-  const [status, setStatus] = createSignal("");
+	const [status, setStatus] = createSignal("");
 
 	let tabBar!: TabSelectRenderable;
 
@@ -33,10 +29,23 @@ export function App() {
 		tabBar.setSelectedIndex(index);
 	}
 
-	useKeyboard((key) => {
-		if (key.name === "q") renderer.destroy();
-		if (key.name >= "1" && key.name <= "3") showTab(Number(key.name) - 1);
-	});
+	function nextTab() {
+		showTab((activeTab() + 1) % TABS.length);
+	}
+
+	const notTyping = () => !keyboard.isInputFocused();
+
+	keyboard.registerGlobal([
+		{
+			key: "q",
+			label: "quit",
+			when: notTyping,
+			action: () => renderer.destroy(),
+		},
+		{ key: "tab", label: "next tab", action: () => nextTab() },
+	]);
+
+	useKeyboard((key) => keyboard.handleKey(key));
 
 	return (
 		<box
@@ -86,10 +95,10 @@ export function App() {
 			>
 				<Switch>
 					<Match when={activeTab() === 0}>
-						<InstalledTab setStatus={setStatus} />
+						<InstalledTab setStatus={setStatus} keyboard={keyboard} />
 					</Match>
 					<Match when={activeTab() === 1}>
-						<SearchTab />
+						<SearchTab keyboard={keyboard} />
 					</Match>
 					<Match when={activeTab() === 2}>
 						<LedgersTab />
@@ -110,7 +119,7 @@ export function App() {
 				}}
 			>
 				<text fg={theme.textDim}>{status()}</text>
-				<text fg={theme.textDim}>{TAB_HINTS[activeTab()]}</text>
+				<text fg={theme.textDim}>{keyboard.hints()}</text>
 			</box>
 		</box>
 	);
