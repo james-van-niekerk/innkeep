@@ -13,7 +13,7 @@ bun install
 ## Run
 
 ```bash
-bun run index.ts
+bun run index.tsx
 ```
 
 Press `q` to quit.

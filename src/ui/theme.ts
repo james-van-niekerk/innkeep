@@ -9,4 +9,4 @@ export const theme = {
 	statusBg: "#171c24",
 } as const;
 
-export const borderStyle = "rounded" as const;
+export const borderStyle = "single" as const;

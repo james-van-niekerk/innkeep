@@ -24,7 +24,7 @@ export async function search(query: string): Promise<string[]> {
 	return out
 		.split("\n")
 		.map((l) => l.trim())
-		.filter((l) => l && !l.startsWith("==>"));
+    .filter((l) => l && !l.startsWith("==>"));
 }
 
 export async function info(name: string): Promise<unknown> {
