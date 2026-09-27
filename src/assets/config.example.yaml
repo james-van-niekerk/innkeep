@@ -1,0 +1,16 @@
+# innkeep configuration
+# Delete this file to regenerate it with the defaults.
+
+# Folder containing your ledger files. "~" expands to your home directory.
+ledgersPath: "{{ledgersPath}}"
+
+# Colours as hex strings, e.g. "#4c8fd6". Leave empty ("") to use the default.
+theme:
+  bg: ""
+  panelBg: ""
+  border: ""
+  borderFocus: ""
+  text: ""
+  textDim: ""
+  accent: ""
+  statusBg: ""

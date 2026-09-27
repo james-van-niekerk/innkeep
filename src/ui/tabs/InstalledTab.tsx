@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
-import { listInstalledCasks, listInstalledFormulae } from "../../services/brew";
+import { listInstalledCasks, listInstalledFormulae, uninstall } from "../../lib/brew";
 import type { BrewPackage } from "../../types/brew";
 import type { KeyboardService } from "../keyboard/keyboard";
 import { borderStyle, theme } from "../theme";
@@ -55,6 +55,15 @@ export function InstalledTab(props: {
 					key: "right",
 					label: "pane",
 					action: () => setFocusedPane("main"),
+        },
+        {
+					key: "d",
+					label: "uninstall",
+					when: () => focusedPane() === "main" && packages().length > 0,
+					action: () => {
+						const selected = selectedPackage();
+						if (selected) uninstall(selected.name);
+					},
 				},
 			],
 		});

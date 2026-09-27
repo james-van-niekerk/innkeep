@@ -101,7 +101,7 @@ export function App() {
 						<SearchTab keyboard={keyboard} />
 					</Match>
 					<Match when={activeTab() === 2}>
-						<LedgersTab />
+						<LedgersTab setStatus={setStatus} keyboard={keyboard} />
 					</Match>
 				</Switch>
 			</box>

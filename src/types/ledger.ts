@@ -5,3 +5,8 @@ export interface Ledger {
 	casks: BrewPackage[];
 	savedAt: string;
 }
+
+export interface LedgerFile {
+	name: string;
+	path: string;
+}
